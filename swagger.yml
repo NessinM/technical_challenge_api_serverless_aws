@@ -1,0 +1,239 @@
+openapi: 3.0.1
+info:
+  title: Star Wars API
+  description: API para obtener información de personajes y naves del universo Star Wars.
+  version: 1.0.0
+servers:
+  - url: "https://ga5hjn3a0h.execute-api.us-east-1.amazonaws.com/{stage}"
+    description: API Gateway URL
+    variables:
+      stage:
+        default: prod
+
+paths:
+  /personajes:
+    get:
+      summary: Obtener todos los personajes
+      description: Devuelve una lista de todos los personajes.
+      operationId: obtenerPersonajes
+      responses:
+        "200":
+          description: Lista de personajes obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Personaje"
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /personajes/pagina/{pagina}:
+    get:
+      summary: Obtener personajes por número de página
+      description: Devuelve una lista de personajes filtrados por número de página.
+      operationId: obtenerPersonajesPorNumeroDePagina
+      parameters:
+        - in: path
+          name: pagina
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: Número de página para la paginación de personajes
+      responses:
+        "200":
+          description: Lista de personajes de la página solicitada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Personaje"
+        "400":
+          description: Solicitud incorrecta, parámetro de página requerido
+        "500":
+          description: Error interno del servidor
+  /personajes/buscar/{nombre}:
+    get:
+      summary: Buscar personajes por nombre
+      description: Devuelve un personaje basado en el nombre proporcionado.
+      operationId: buscarPersonajesPorNombre
+      parameters:
+        - in: path
+          name: nombre
+          required: true
+          schema:
+            type: string
+            example: Luke Skywalker
+          description: Nombre del personaje a buscar
+      responses:
+        "200":
+          description: Personaje encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Personaje"
+        "400":
+          description: Solicitud incorrecta, parámetro de nombre requerido
+        "404":
+          description: Personaje no encontrado
+        "500":
+          description: Error interno del servidor
+  /naves:
+    post:
+      summary: Crear una nueva nave
+      description: Crea una nueva nave en la base de datos.
+      operationId: crearNave
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Nave"
+      responses:
+        "201":
+          description: Nave creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Nave"
+        "400":
+          description: Error en los datos enviados
+        "500":
+          description: Error interno del servidor
+    get:
+      summary: Obtener todas las naves
+      description: Devuelve una lista de todas las naves.
+      operationId: obtenerNaves
+      responses:
+        "200":
+          description: Lista de naves obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Nave"
+        "500":
+          description: Error interno del servidor
+  /naves/{id}:
+    get:
+      summary: Obtener una nave por ID
+      description: Devuelve una nave específica basada en su ID.
+      operationId: obtenerNavePorId
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: ID de la nave a obtener
+      responses:
+        "200":
+          description: Nave obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Nave"
+        "404":
+          description: Nave no encontrada
+        "500":
+          description: Error interno del servidor
+  /naves/buscar:
+    get:
+      summary: Buscar naves por fabricante
+      description: Devuelve una lista de naves filtradas por el fabricante.
+      operationId: buscarNavesPorFabricante
+      parameters:
+        - in: query
+          name: fabricante
+          required: true
+          schema:
+            type: string
+          description: Nombre del fabricante para filtrar las naves
+      responses:
+        "200":
+          description: Lista de naves filtradas por fabricante
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Nave"
+        "400":
+          description: Parámetro de fabricante requerido
+        "500":
+          description: Error interno del servidor
+components:
+  schemas:
+    Nave:
+      type: object
+      properties:
+        nombre:
+          type: string
+        modelo:
+          type: string
+        fabricante:
+          type: string
+        costoEnCreditos:
+          type: number
+        longitud:
+          type: string
+        velocidadMaximaAtmosfera:
+          type: string
+        tripulacion:
+          type: string
+        pasajeros:
+          type: string
+        capacidadCarga:
+          type: string
+        consumibles:
+          type: string
+        clase:
+          type: string
+      required:
+        - nombre
+        - modelo
+        - fabricante
+        - costoEnCreditos
+        - longitud
+        - velocidadMaximaAtmosfera
+        - tripulacion
+        - pasajeros
+        - capacidadCarga
+        - consumibles
+        - clase
+    Personaje:
+      type: object
+      properties:
+        nombre:
+          type: string
+        altura:
+          type: string
+        masa:
+          type: string
+        colorCabello:
+          type: string
+        colorPiel:
+          type: string
+        colorOjos:
+          type: string
+        periodoNacimiento:
+          type: string
+        genero:
+          type: string
+        residentes:
+          type: array
+          items:
+            type: string
+        peliculas:
+          type: array
+          items:
+            type: string

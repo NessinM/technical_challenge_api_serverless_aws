@@ -1,0 +1,33 @@
+{
+  "name": "serverless-star-wars-api-indra",
+  "version": "1.0.0",
+  "author": "Nesyn Meomer Alvarado Bedoya",
+  "description": "API Serverless con integración SWAPI y DynamoDB",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "dev": "sls offline --verbose",
+    "deploy": "sls deploy --stage prod --verbose",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.x",
+    "@aws-sdk/lib-dynamodb": "^3.x",
+    "axios": "^1.6.2",
+    "http-errors": "^2.0.0",
+    "joi": "^17.11.0",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.11",
+    "aws-sdk-client-mock": "^3.0.0",
+    "eslint": "^8.55.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "jest": "^29.7.0",
+    "serverless": "^3.38.0",
+    "serverless-offline": "^13.3.0"
+  }
+}

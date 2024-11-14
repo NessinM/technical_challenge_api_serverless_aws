@@ -1,0 +1,123 @@
+service: star-wars-api
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${sls:stage}
+    STAGE: ${sls:stage}
+    LOG_LEVEL: ${opt:log-level, 'info'}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+          Resource:
+            - "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+            - "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*"
+
+plugins:
+  - serverless-offline
+
+functions:
+  obtenerPersonajes:
+    handler: src/handlers/personajes.obtenerPersonajes
+    events:
+      - http:
+          path: personajes
+          method: get
+          cors: true
+
+  obtenerPersonajesPorNumeroDePagina:
+    handler: src/handlers/personajes.obtenerPersonajesPorNumeroDePagina
+    events:
+      - http:
+          path: personajes/pagina/{page}
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                page: true
+
+  buscarPersonajesPorNombre:
+    handler: src/handlers/personajes.buscarPersonajesPorNombre
+    events:
+      - http:
+          path: personajes/buscar/{name}
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                name: true
+
+  crearNave:
+    handler: src/handlers/naves.crearNave
+    events:
+      - http:
+          path: naves
+          method: post
+          cors: true
+
+  obtenerNaves:
+    handler: src/handlers/naves.obtenerNaves
+    events:
+      - http:
+          path: naves
+          method: get
+          cors: true
+
+  obtenerNavePorId:
+    handler: src/handlers/naves.obtenerNavePorId
+    events:
+      - http:
+          path: naves/{id}
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+
+  buscarNavesPorFabricante:
+    handler: src/handlers/naves.buscarNavesPorFabricante
+    events:
+      - http:
+          path: naves/buscar
+          method: get
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                fabricante: true
+
+resources:
+  Resources:
+    NavesTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: fabricante
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: FabricanteIndex
+            KeySchema:
+              - AttributeName: fabricante
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
